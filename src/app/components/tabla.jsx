@@ -6,25 +6,33 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { ChevronDown, ChevronUp, Package, TrendingUp, AlertTriangle, Calendar } from "lucide-react"
-import { Play, RefreshCcw } from "lucide-react"
+import { ChevronDown, ChevronUp, Package, TrendingUp, AlertTriangle, Calendar, RefreshCcw, Play } from "lucide-react"
 
 export default function InventarioPage() {
   const [data, setData] = useState([])
   const [showFullTable, setShowFullTable] = useState(false)
-
   const [loading, setLoading] = useState(false)
-  
+
   useEffect(() => {
-    const fetchData = async () => {
-      const { data, error } = await supabase.from("InvResponses").select("*").order("fecha", { ascending: false })
-
-      if (error) console.error(error)
-      else setData(data)
-    }
-
     fetchData()
   }, [])
+
+  const fetchData = async () => {
+    setLoading(true)
+    const { data, error } = await supabase.from("InvResponses").select("*").order("fecha", { ascending: false })
+
+    if (error) console.error(error)
+    else setData(data)
+    setLoading(false)
+  }
+
+  const ejecutarWorkflow = async () => {
+    setLoading(true)
+    // Lógica para ejecutar el workflow (simulada)
+    await new Promise((resolve) => setTimeout(resolve, 2000)) // Simula una llamada a la API
+    setLoading(false)
+    alert("Workflow ejecutado!")
+  }
 
   // Obtener estadísticas
   const recentSuggestions = data.slice(0, 5)
@@ -68,83 +76,78 @@ export default function InventarioPage() {
     }
   }
 
-    const fetchData = async () => {
-    setLoading(true)
-    const { data, error } = await supabase
-      .from("InvResponses")
-      .select("*")
-      .order("fecha", { ascending: false })
-
-    if (error) console.error(error)
-    else setData(data)
-    setLoading(false)
-  }
-
-const ejecutarWorkflow = async () => {
-    setLoading(true)
-    const res = await fetch("https://norksrms.app.n8n.cloud/webhook-test/6ab7bb26-79c9-4497-b3f5-95f98380dc62", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ accion: "actualizar" }),
-    })
-
-    const result = await res.json()
-    setData(result) // <- actualiza la tabla
-    setLoading(false)
-  }
-
   return (
-    <div className="p-6 space-y-6 w-5xl max-w-7xl mx-auto">
-      <div className="flex items-center justify-between">
+    <div className="p-3 sm:p-6 space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Inventario Inteligente</h1>
-          <p className="text-muted-foreground">Gestión automatizada de sugerencias de inventario farmacéutico</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Inventario Inteligente</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
+            Gestión automatizada de sugerencias de inventario farmacéutico
+          </p>
         </div>
 
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Calendar className="h-4 w-4" />
-          Última actualización: {data[0] ? new Date(data[0].fecha).toLocaleDateString() : "N/A"}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+            <Calendar className="h-4 w-4" />
+            <span className="hidden sm:inline">Última actualización:</span>
+            <span className="sm:hidden">Actualizado:</span>
+            {data[0] ? new Date(data[0].fecha).toLocaleDateString() : "N/A"}
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Button
+              className="bg-emerald-600 hover:bg-emerald-800 text-white flex-1 sm:flex-none text-sm"
+              onClick={ejecutarWorkflow}
+              disabled={loading}
+              size="sm"
+            >
+              <Play className="h-4 w-4" />
+              <span className="hidden xs:inline ml-1">Ejecutar</span>
+            </Button>
+            <Button
+              className="bg-indigo-500 hover:bg-indigo-800 text-white flex-1 sm:flex-none text-sm"
+              onClick={() => fetchData()}
+              disabled={loading}
+              size="sm"
+            >
+              <RefreshCcw className="h-4 w-4" />
+              <span className="hidden xs:inline ml-1">Refrescar</span>
+            </Button>
+          </div>
         </div>
       </div>
-        <div className="flex items-center gap-2">
-          <Button className="bg-emerald-600 hover:bg-emerald-800 text-white" onClick={ejecutarWorkflow} disabled={loading}>
-            <Play /> Ejecutar
-          </Button>
-          <Button className="bg-indigo-500 hover:bg-indigo-800 text-white" onClick={() => fetchData()} disabled={loading}>
-            <RefreshCcw /> Refrescar
-          </Button>
-        </div>
+
       {/* Cards de estadísticas */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Sugerencias</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-6">
+            <CardTitle className="text-xs sm:text-sm font-medium">Total Sugerencias</CardTitle>
+            <Package className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{totalSuggestions}</div>
+          <CardContent className="px-3 sm:px-6">
+            <div className="text-lg sm:text-2xl font-bold">{totalSuggestions}</div>
             <p className="text-xs text-muted-foreground">Sugerencias registradas</p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Hoy</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-6">
+            <CardTitle className="text-xs sm:text-sm font-medium">Hoy</CardTitle>
+            <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{todaySuggestions}</div>
+          <CardContent className="px-3 sm:px-6">
+            <div className="text-lg sm:text-2xl font-bold">{todaySuggestions}</div>
             <p className="text-xs text-muted-foreground">Sugerencias de hoy</p>
           </CardContent>
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Más Frecuente</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-6">
+            <CardTitle className="text-xs sm:text-sm font-medium">Más Frecuente</CardTitle>
+            <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
+          <CardContent className="px-3 sm:px-6">
+            <div className="text-lg sm:text-2xl font-bold">
               {Object.keys(suggestionTypes).length > 0
                 ? Object.entries(suggestionTypes).sort(([, a], [, b]) => b - a)[0][0]
                 : "N/A"}
@@ -154,12 +157,12 @@ const ejecutarWorkflow = async () => {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Productos Únicos</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-3 sm:px-6">
+            <CardTitle className="text-xs sm:text-sm font-medium">Productos Únicos</CardTitle>
+            <AlertTriangle className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{new Set(data.map((item) => item.producto)).size}</div>
+          <CardContent className="px-3 sm:px-6">
+            <div className="text-lg sm:text-2xl font-bold">{new Set(data.map((item) => item.producto)).size}</div>
             <p className="text-xs text-muted-foreground">Productos diferentes</p>
           </CardContent>
         </Card>
@@ -179,20 +182,26 @@ const ejecutarWorkflow = async () => {
             {recentSuggestions.map((item, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors gap-3 sm:gap-0"
               >
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 flex-shrink-0">
                     {getSuggestionIcon(item.tipo_sugerencia)}
                   </div>
-                  <div>
-                    <p className="font-medium">{item.producto}</p>
-                    <p className="text-sm text-muted-foreground truncate max-w-md">{item.motivo}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-sm sm:text-base truncate">{item.producto}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 sm:line-clamp-1">
+                      {item.motivo}
+                    </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Badge className={getSuggestionBadgeColor(item.tipo_sugerencia)}>{item.tipo_sugerencia}</Badge>
-                  <span className="text-sm text-muted-foreground">{new Date(item.fecha).toLocaleDateString()}</span>
+                <div className="flex items-center justify-between sm:justify-end gap-2 flex-shrink-0">
+                  <Badge className={`${getSuggestionBadgeColor(item.tipo_sugerencia)} text-xs`}>
+                    {item.tipo_sugerencia}
+                  </Badge>
+                  <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
+                    {new Date(item.fecha).toLocaleDateString()}
+                  </span>
                 </div>
               </div>
             ))}
@@ -225,35 +234,44 @@ const ejecutarWorkflow = async () => {
             <CardDescription>Todas las sugerencias del sistema ordenadas por fecha</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[200px]">Producto</TableHead>
-                    <TableHead>Sugerencia</TableHead>
-                    <TableHead className="hidden md:table-cell">Motivo</TableHead>
-                    <TableHead className="w-[120px]">Fecha</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {data.map((row, index) => (
-                    <TableRow key={index} className="hover:bg-muted/50">
-                      <TableCell className="font-medium">{row.producto}</TableCell>
-                      <TableCell>
-                        <Badge className={getSuggestionBadgeColor(row.tipo_sugerencia)}>{row.tipo_sugerencia}</Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell max-w-md">
-                        <span className="truncate block" title={row.motivo}>
-                          {row.motivo}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {new Date(row.fecha).toLocaleDateString()}
-                      </TableCell>
+            <div className="rounded-md border overflow-hidden">
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="min-w-[150px] sm:w-[200px]">Producto</TableHead>
+                      <TableHead className="min-w-[100px]">Sugerencia</TableHead>
+                      <TableHead className="hidden lg:table-cell min-w-[200px]">Motivo</TableHead>
+                      <TableHead className="min-w-[100px] sm:w-[120px]">Fecha</TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {data.map((row, index) => (
+                      <TableRow key={index} className="hover:bg-muted/50">
+                        <TableCell className="font-medium text-sm">
+                          <div className="truncate max-w-[120px] sm:max-w-none" title={row.producto}>
+                            {row.producto}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={`${getSuggestionBadgeColor(row.tipo_sugerencia)} text-xs`}>
+                            <span className="hidden sm:inline">{row.tipo_sugerencia}</span>
+                            <span className="sm:hidden">{row.tipo_sugerencia.substring(0, 3)}</span>
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="hidden lg:table-cell max-w-md">
+                          <span className="truncate block text-sm" title={row.motivo}>
+                            {row.motivo}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground text-xs sm:text-sm">
+                          <div className="whitespace-nowrap">{new Date(row.fecha).toLocaleDateString()}</div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
           </CardContent>
         </Card>

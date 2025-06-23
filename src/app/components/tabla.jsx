@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ChevronDown, ChevronUp, Package, TrendingUp, AlertTriangle, Calendar } from "lucide-react"
+import { Play, RefreshCcw } from "lucide-react"
 
 export default function InventarioPage() {
   const [data, setData] = useState([])
@@ -67,6 +68,18 @@ export default function InventarioPage() {
     }
   }
 
+    const fetchData = async () => {
+    setLoading(true)
+    const { data, error } = await supabase
+      .from("InvResponses")
+      .select("*")
+      .order("fecha", { ascending: false })
+
+    if (error) console.error(error)
+    else setData(data)
+    setLoading(false)
+  }
+
 const ejecutarWorkflow = async () => {
     setLoading(true)
     const res = await fetch("https://norksrms.app.n8n.cloud/webhook-test/6ab7bb26-79c9-4497-b3f5-95f98380dc62", {
@@ -81,7 +94,7 @@ const ejecutarWorkflow = async () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 w-5xl max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Inventario Inteligente</h1>
@@ -94,11 +107,11 @@ const ejecutarWorkflow = async () => {
         </div>
       </div>
         <div className="flex items-center gap-2">
-          <Button className="bg-green-600 hover:bg-green-800 text-white" onClick={ejecutarWorkflow} disabled={loading}>
-            Ejecutar
+          <Button className="bg-emerald-600 hover:bg-emerald-800 text-white" onClick={ejecutarWorkflow} disabled={loading}>
+            <Play /> Ejecutar
           </Button>
-          <Button className="bg-blue-600 hover:bg-blue-800 text-white" onClick={() => setData([])}>
-            Refrescar
+          <Button className="bg-indigo-500 hover:bg-indigo-800 text-white" onClick={() => fetchData()} disabled={loading}>
+            <RefreshCcw /> Refrescar
           </Button>
         </div>
       {/* Cards de estadísticas */}

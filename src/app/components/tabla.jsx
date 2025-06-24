@@ -37,30 +37,35 @@ export default function InventarioApp() {
       tipo_sugerencia: "comprar",
       motivo: "Stock bajo, alta rotación en temporada de gripe",
       fecha: new Date().toISOString(),
+      existencias: 2,
     },
     {
       producto: "Ibuprofeno 400mg",
       tipo_sugerencia: "mantener",
       motivo: "Stock adecuado para demanda actual",
       fecha: new Date(Date.now() - 86400000).toISOString(),
+      existencias: 10,
     },
     {
       producto: "Jarabe para la tos",
       tipo_sugerencia: "reducir",
       motivo: "Baja rotación, próximo a vencer",
       fecha: new Date(Date.now() - 172800000).toISOString(),
+      existencias: 23,
     },
     {
       producto: "Vitamina C 1000mg",
       tipo_sugerencia: "comprar",
       motivo: "Aumento de demanda estacional",
       fecha: new Date(Date.now() - 259200000).toISOString(),
+      existencias: 5,
     },
     {
       producto: "Antihistamínico",
       tipo_sugerencia: "mantener",
       motivo: "Rotación estable durante todo el año",
       fecha: new Date(Date.now() - 345600000).toISOString(),
+      existencias: 11,
     },
   ]
 
@@ -155,13 +160,15 @@ export default function InventarioApp() {
       case "comprar":
       case "reabastecer":
         return "bg-red-100 text-red-800 border-red-200"
-      case "reducir":
+      case "mantener":
       case "liquidar":
         return "bg-orange-100 text-orange-800 border-orange-200"
-      case "mantener":
+      case "evitar":
         return "bg-green-100 text-green-800 border-green-200"
       default:
         return "bg-blue-100 text-blue-800 border-blue-200"
+        case "estacional":
+        return "bg-purple-100 text-purple-800 border-purple-200"
     }
   }
 
@@ -303,7 +310,7 @@ export default function InventarioApp() {
                     {getSuggestionIcon(item.tipo_sugerencia)}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm sm:text-base truncate">{item.producto}</p>
+                    <p className="font-medium text-sm sm:text-base truncate">{item.producto} <Badge className="bg-blue-100 text-blue-950 text-xs rounded pl-2">{item.existencias}</Badge></p>
                     <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 sm:line-clamp-1">
                       {item.motivo}
                     </p>
@@ -354,6 +361,7 @@ export default function InventarioApp() {
                   <TableHeader>
                     <TableRow>
                       <TableHead className="min-w-[150px] sm:w-[200px]">Producto</TableHead>
+                      <TableHead className="min-w-[100px] sm:w-[120px]">existencias</TableHead>
                       <TableHead className="min-w-[100px]">Sugerencia</TableHead>
                       <TableHead className="hidden lg:table-cell min-w-[200px]">Motivo</TableHead>
                       <TableHead className="min-w-[100px] sm:w-[120px]">Fecha</TableHead>
@@ -365,6 +373,11 @@ export default function InventarioApp() {
                         <TableCell className="font-medium text-sm">
                           <div className="truncate max-w-[120px] sm:max-w-none" title={row.producto}>
                             {row.producto}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2" title={row.existencias}>
+                            {row.existencias}
                           </div>
                         </TableCell>
                         <TableCell>

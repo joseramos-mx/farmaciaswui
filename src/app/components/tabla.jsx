@@ -106,7 +106,7 @@ export default function InventarioApp() {
     setLoading(true)
     try {
       // Intentar llamar al webhook
-      const response = await fetch("https://norksrms.app.n8n.cloud/webhook-test/6ab7bb26-79c9-4497-b3f5-95f98380dc62", {
+      const response = await fetch("https://norksrms.app.n8n.cloud/webhook/6ab7bb26-79c9-4497-b3f5-95f98380dc62", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ accion: "actualizar" }),

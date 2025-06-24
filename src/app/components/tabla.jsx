@@ -123,9 +123,7 @@ export default function InventarioApp() {
       }
     } catch (error) {
       console.error("Error ejecutando workflow:", error)
-      // Simular ejecución exitosa con datos de ejemplo
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-      alert("Workflow ejecutado exitosamente! (modo demo)")
+
     }
 
     // Refrescar datos después de ejecutar
@@ -204,9 +202,9 @@ export default function InventarioApp() {
               <User className="h-4 w-4" />
               <span>{currentUser?.name || currentUser?.email}</span>
             </div>
-            <Button variant="outline" size="sm" onClick={handleLogout} className="text-xs">
+            <Button variant="outline" size="sm" onClick={handleLogout} className="text-xs hover:bg-red-400 hover:text-white">
               <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline ml-1">Salir</span>
+              <span className="hidden sm:inline ml-1 ">Salir</span>
             </Button>
           </div>
 

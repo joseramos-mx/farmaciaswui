@@ -16,7 +16,7 @@ export default function LoginForm({ onLoginSuccess }) {
   const [error, setError] = useState("")
 
   // Credenciales hardcodeadas para demo
-  const ADMIN_EMAIL = "admin@farmacia.com"
+  const ADMIN_EMAIL = "jeffy@farmacia.com"
   const ADMIN_PASSWORD = "admin123"
 
   const handleSubmit = async (e) => {
